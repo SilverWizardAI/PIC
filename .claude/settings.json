@@ -1,0 +1,57 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "Bash",
+      "Grep",
+      "Glob",
+      "ListDir",
+      "Task",
+      "WebFetch",
+      "WebSearch",
+      "NotebookRead",
+      "NotebookEdit",
+      "TodoRead",
+      "TodoWrite",
+      "Skill(*)",
+      "mcp__*",
+      "mcp__gcc-memory__*",
+      "mcp__gmsg__*",
+      "mcp__gpyqt-instrument__*"
+    ],
+    "deny": [],
+    "defaultMode": "dontAsk"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/tools/conference_reminder.py",
+            "blocking": false
+          }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "gmsg": {
+      "command": "/Users/stevedeighton/Library/CloudStorage/Dropbox/A_Coding/MM/run_gmsg_mcp.sh"
+    },
+    "conf-tools": {
+      "command": "/Users/stevedeighton/Library/CloudStorage/Dropbox/A_Coding/CONF/run_conf_tools_mcp.sh"
+    }
+  },
+  "allowedMcpTools": {
+    "gmsg": [
+      "*"
+    ],
+    "conf-tools": [
+      "*"
+    ]
+  }
+}
