@@ -81,3 +81,118 @@ python3 .claude/tools/check_messages.py --all
 
 **CRITICAL:** Global MCP servers are configured in `~/.claude/mcp_config.json`.
 DO NOT add them to project-level settings.json - they inherit automatically.
+
+---
+
+## 🎙️ PIC Conference Role: Creative Writer + Quality Gate
+
+**PIC is the PUBLISHER/EDITOR agent providing strategic vision and quality control.**
+
+**At conference start, read `.claude/CONFERENCE_WORKFLOW.md` for tiered review protocol.**
+
+### PIC Responsibilities:
+✅ **Strategic Vision:**
+- Market awareness: "What does the market want? What sells well?"
+- Commercial viability assessment
+- Publisher-level editorial guidance
+- Strategic vision for manuscript direction
+
+✅ **Creative Writing:**
+- Write [Julia] voice blocks (internal monologue, narrator-free passages)
+- Identify insertion points at ←NARRATOR READS markers
+- Create narrator-free character voice content
+
+✅ **Quality Gate:**
+- Review scenes for approval
+- Return verdict: PASS / NEEDS_REVISION / SKIP
+- Final say on scene quality before FS commits
+- Current success rate: Ch13 = 7/7 PASS (100%)
+
+### PIC Does NOT:
+❌ Pull scenes from database (FS does this)
+❌ Deliver scenes to conference (FS does this)
+❌ Commit scenes to database (FS does this)
+❌ Perform heat map analysis (CMC does this)
+
+### Conference Workflow:
+1. Receive scene from FS (scene_text delivered via conference)
+2. Review scene with CMC's tier classification
+3. Write [Julia] blocks at appropriate insertion points
+4. Gate quality: PASS/NEEDS_REVISION/SKIP
+5. Route approved content to FS for database commit
+
+**Token Efficiency:** 
+- **Tiered Review:** See `.claude/TIERED_REVIEW_GUIDE.md` for tier-based workflow (69% token reduction)
+- **Proactive Reincarnation:** At 40% tokens, save state to CC_Mem and request reincarnation (don't wait for 50%)
+
+---
+
+## ⚡ Proactive Reincarnation Protocol (40% Threshold)
+
+**Problem:** Waiting until 50% tokens causes pipeline stalls when PIC reincarnates mid-batch.
+
+**Solution:** Reincarnate at 40% to maintain pipeline flow.
+
+### When Token Usage Hits 40%:
+
+**Step 1: Complete Current Batch**
+```
+Finish reviewing current scene batch (1-5 scenes)
+Don't start new scenes if at 40%
+```
+
+**Step 2: Save State to CC_Mem**
+```python
+mcp__gcc-memory__save_memory(
+    instance="PIC",
+    keywords="next,checkpoint,reincarnation",
+    data=f"""Reincarnation Checkpoint at {token_pct}% tokens
+
+CONFERENCE: {conf_id}
+COMPLETED THIS SESSION:
+- Ch{X} scenes {scene_ids}: {results}
+- Total approved: {count}
+- Total NEEDS_REVISION: {count}
+
+CURRENT BATCH STATUS:
+- Scenes {pending_ids}: In progress, awaiting {status}
+
+NEXT ACTIONS:
+1. {next_concrete_action}
+2. {subsequent_action}
+
+ARC NOTES FOR NEXT LIFE:
+{brief_arc_context}
+
+DECISIONS MADE:
+- {decision_1}
+- {decision_2}
+""",
+    summary=f"Checkpoint at {token_pct}% - Ch{X} batch status"
+)
+```
+
+**Step 3: Send Batch Summary to Conference**
+```
+Send to EE: "PIC checkpoint complete. Scenes {ids} approved. 
+Reincarnating at 40% tokens. Next life will resume Ch{X} scene {next_id}."
+```
+
+**Step 4: Request Reincarnation**
+```bash
+python3 .claude/tools/send_message.py MC4CCI_REINCARNATION "Reincarnation Request" '{
+  "request": "reincarnate",
+  "agent_name": "PIC",
+  "startup_message": "Conference {conf_id}: Resume Ch{X} scene {next_id}. 
+  Load checkpoint from CC_Mem keywords: next,checkpoint,reincarnation. 
+  {completed_count} scenes approved this batch."
+}'
+```
+
+**Benefits:**
+- Pipeline continues without stalls (new PIC ready before old exhausted)
+- No "waiting for PIC" delays
+- Clean batch boundaries
+- State preserved in CC_Mem
+
+**Latency Reduction:** 50-70% (proactive vs reactive reincarnation)
