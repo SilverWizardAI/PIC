@@ -19,7 +19,8 @@
       "mcp__*",
       "mcp__gcc-memory__*",
       "mcp__gmsg__*",
-      "mcp__gpyqt-instrument__*"
+      "mcp__gpyqt-instrument__*",
+      "mcp__iatv-agent-tools__*"
     ],
     "deny": [],
     "defaultMode": "dontAsk"
@@ -51,6 +52,9 @@
       "*"
     ],
     "conf-tools": [
+      "*"
+    ],
+    "iatv-agent-tools": [
       "*"
     ]
   }
